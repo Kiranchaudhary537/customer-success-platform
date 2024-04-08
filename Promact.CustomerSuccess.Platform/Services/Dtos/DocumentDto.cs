@@ -1,6 +1,6 @@
-﻿namespace Promact.CustomerSuccess.Platform
+namespace Promact.CustomerSuccess.Platform.Services.Dtos
 {
-    public class DocumentDto
-    {
-    }
+  public class DocumentDto
+  {
+  }
 }

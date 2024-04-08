@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -48,6 +48,12 @@ using Volo.Abp.Security.Claims;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Test.Authorization;
+using Test.Requirement;
+using Volo.Abp.Authorization;
 
 namespace Promact.CustomerSuccess.Platform;
 
@@ -102,7 +108,6 @@ public class PlatformModule : AbpModule
 {
     /* Single point to enable/disable multi-tenancy */
     private const bool IsMultiTenant = true;
-
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
@@ -149,7 +154,7 @@ public class PlatformModule : AbpModule
             context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
         }
 
-        ConfigureAuthentication(context);
+        ConfigureAuthentication(context,configuration);
         ConfigureBundles();
         ConfigureMultiTenancy();
         ConfigureUrls(configuration);
@@ -161,15 +166,213 @@ public class PlatformModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureDataProtection(context);
         ConfigureEfCore(context);
+  
     }
 
-    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
     {
+
+        // Forward authentication for bearer token
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+        
+        // Configure ABP claims principal factory options
         context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
         {
             options.IsDynamicClaimsEnabled = true;
         });
+
+        // Add JWT authentication
+        context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddJwtBearer(options =>
+                        {
+                            var audience = configuration["Auth0:Audience"];
+                            var authority = configuration["Auth0:Authority"];
+                            options.Authority = authority;
+                            options.Audience = audience;
+                            options.RequireHttpsMetadata = false;
+                            options.MetadataAddress = $"{authority}/.well-known/openid-configuration";
+                            options.TokenValidationParameters = new TokenValidationParameters
+                            {
+                                ValidateAudience = true,
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
+                                {
+                                    var resolver = new DynamicOpenIdConnectSigningKeyResolver();
+                                    return resolver.GetSigningKeysAsync().Result; // Await the asynchronous task
+                                },
+                            };
+                        });
+
+        // Add authorization policies
+        context.Services.AddAuthorization(options =>
+        {
+            // Project policies
+            options.AddPolicy("read:project", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:project"));
+            });
+            options.AddPolicy("create:project", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:project"));
+            });
+            options.AddPolicy("update:project", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:project"));
+            });
+            options.AddPolicy("delete:project", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:project"));
+            });
+
+            // Approved team policies
+            options.AddPolicy("read:approved-team", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:approved-team"));
+            });
+            options.AddPolicy("create:approved-team", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:approved-team"));
+            });
+            options.AddPolicy("update:approved-team", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:approved-team"));
+            });
+            options.AddPolicy("delete:approved-team", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:approved-team"));
+            });
+
+
+            // audit history policies
+            options.AddPolicy("read:audit-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:audit-history"));
+            });
+            options.AddPolicy("create:audit-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:audit-history"));
+            });
+            options.AddPolicy("update:audit-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:audit-history"));
+            });
+            options.AddPolicy("delete:audit-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:audit-history"));
+            });
+
+            // client feedback policies
+            options.AddPolicy("read:client-feedback", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:client-feedback"));
+            });
+            options.AddPolicy("create:client-feedback", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:client-feedback"));
+            });
+            options.AddPolicy("update:client-feedback", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:client-feedback"));
+            });
+            options.AddPolicy("delete:client-feedback", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:client-feedback"));
+            });
+
+            // risk profile policies
+            options.AddPolicy("read:risk-profile", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:risk-profile"));
+            });
+            options.AddPolicy("create:risk-profile", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:risk-profile"));
+            });
+            options.AddPolicy("update:risk-profile", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:risk-profile"));
+            });
+            options.AddPolicy("delete:risk-profile", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:risk-profile"));
+            });
+
+            // escalation matrix policies
+            options.AddPolicy("read:escalation-matrix", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:escalation-matrix"));
+            });
+            options.AddPolicy("create:escalation-matrix", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:escalation-matrix"));
+            });
+            options.AddPolicy("update:escalation-matrix", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:escalation-matrix"));
+            });
+            options.AddPolicy("delete:escalation-matrix", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:escalation-matrix"));
+            });
+
+            // meeting minute policies
+            options.AddPolicy("read:meeting-minute", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:meeting-minute"));
+            });
+            options.AddPolicy("create:meeting-minute", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:meeting-minute"));
+            });
+            options.AddPolicy("update:meeting-minute", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:meeting-minute"));
+            });
+            options.AddPolicy("delete:meeting-minute", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:meeting-minute"));
+            });
+
+            // phase policies
+            options.AddPolicy("read:phase", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:phase"));
+            });
+            options.AddPolicy("create:phase", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:phase"));
+            });
+            options.AddPolicy("update:phase", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:phase"));
+            });
+            options.AddPolicy("delete:phase", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:phase"));
+            });
+
+            // version history policies
+            options.AddPolicy("read:version-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("read:version-history"));
+            });
+            options.AddPolicy("create:version-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("create:version-history"));
+            });
+            options.AddPolicy("update:version-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("update:version-history"));
+            });
+            options.AddPolicy("delete:version-history", policy =>
+            {
+                policy.Requirements.Add(new RbacRequirement("delete:version-history"));
+            });
+        });
+
+        // Add RBAC handler
+        context.Services.AddSingleton<IAuthorizationHandler, RbacHandler>();
+
     }
 
     private void ConfigureBundles()

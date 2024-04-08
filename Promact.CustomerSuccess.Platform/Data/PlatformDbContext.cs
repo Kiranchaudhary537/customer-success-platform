@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Promact.CustomerSuccess.Platform.Entities;
+using System.Reflection.Emit;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -32,9 +34,17 @@ public class PlatformDbContext : AbpDbContext<PlatformDbContext>
     public DbSet<EscalationMatrix> EscalationMatrices { get; set; }
     public DbSet<Sprint> Sprints { get; set; }
     public DbSet<ApplicationUser> Users { get; set; }
+    public DbSet<AuditHistory> AuditHistory { get; set; }
+    public DbSet<ApprovedTeam> ApprovedTeams { get; set; }
+    public DbSet<ProjectUpdate> ProjectUpdates { get; set; }
+    public DbSet<ApplicationUser> ApplicationUser { get; set; }
+    public DbSet<VersionHistory> VersionHistories { get; set; }
+    public DbSet<Stakeholder> Stakeholders { get; set; }
+    public DbSet<RemediationStep> RemediationSteps { get; set; }
+    public DbSet<ProjectOverview> ProjectOverviews { get; set; }
+    public DbSet<StakeAndScope> StakeAndScopes { get; set; }
 
-
-    protected override void OnModelCreating(ModelBuilder builder)
+  protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
@@ -67,7 +77,7 @@ public class PlatformDbContext : AbpDbContext<PlatformDbContext>
         });
         builder.Entity<Project>(Project =>
         {
-            Project.ConfigureByConvention();
+          Project.ConfigureByConvention();
         });
         builder.Entity<ProjectBudget>(ProjectBudget =>
         {
@@ -102,6 +112,34 @@ public class PlatformDbContext : AbpDbContext<PlatformDbContext>
             ApplicationUser.ConfigureByConvention();
         });
 
+        builder.Entity<ApprovedTeam>(ApprovedTeam => {
+          ApprovedTeam.ConfigureByConvention();
+        });
 
-    }
+        builder.Entity<AuditHistory>(AuditHistory => {
+          AuditHistory.ConfigureByConvention();
+        });
+
+        builder.Entity<ProjectOverview>(b =>
+         {
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<StakeAndScope>(b =>
+        {
+             b.ConfigureByConvention();
+        });
+
+        builder.Entity<Stakeholder>(Phase =>
+        {
+          Phase.ConfigureByConvention();
+        });
+
+        builder.Entity<RemediationStep>(Phase =>
+        {
+          Phase.ConfigureByConvention();
+        });
+
+
+  }
 }

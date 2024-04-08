@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Promact.CustomerSuccess.Platform.Entities
@@ -10,7 +10,8 @@ namespace Promact.CustomerSuccess.Platform.Entities
         public required string Title { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public required string Description { get; set; }
+        public DateTime ApprovalDate { get; set; }
+        public DateTime RevisedDate { get; set; }
         public required string Comments { get; set; }
         public MilestoneOrPhaseStatus Status { get; set; }
         public virtual Project? Project { get; set; }
