@@ -741,7 +741,6 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("GeneralUpdates")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastModificationTime")
@@ -923,6 +922,9 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                     b.Property<Guid>("PhaseMilestoneId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -936,6 +938,8 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                     b.HasIndex("LastModifierId");
 
                     b.HasIndex("PhaseMilestoneId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("Sprints");
                 });
@@ -1072,6 +1076,8 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                     b.HasIndex("CreatorId");
 
                     b.HasIndex("LastModifierId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("VersionHistories");
                 });
@@ -2949,7 +2955,7 @@ namespace Promact.CustomerSuccess.Platform.Migrations
             modelBuilder.Entity("Promact.CustomerSuccess.Platform.Entities.ProjectOverview", b =>
                 {
                     b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", "Project")
-                        .WithMany()
+                        .WithMany("ProjectOverviews")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2971,7 +2977,7 @@ namespace Promact.CustomerSuccess.Platform.Migrations
             modelBuilder.Entity("Promact.CustomerSuccess.Platform.Entities.ProjectUpdate", b =>
                 {
                     b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", "Project")
-                        .WithMany()
+                        .WithMany("ProjectUpdates")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3041,6 +3047,10 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", null)
+                        .WithMany("Sprints")
+                        .HasForeignKey("ProjectId");
+
                     b.Navigation("Creator");
 
                     b.Navigation("LastModifier");
@@ -3051,7 +3061,7 @@ namespace Promact.CustomerSuccess.Platform.Migrations
             modelBuilder.Entity("Promact.CustomerSuccess.Platform.Entities.StakeAndScope", b =>
                 {
                     b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", "Project")
-                        .WithMany()
+                        .WithMany("StakeAndScopes")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3062,7 +3072,7 @@ namespace Promact.CustomerSuccess.Platform.Migrations
             modelBuilder.Entity("Promact.CustomerSuccess.Platform.Entities.Stakeholder", b =>
                 {
                     b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", "Project")
-                        .WithMany()
+                        .WithMany("Stakeholders")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3079,6 +3089,12 @@ namespace Promact.CustomerSuccess.Platform.Migrations
                     b.HasOne("Promact.CustomerSuccess.Platform.Entities.ApplicationUser", "LastModifier")
                         .WithMany()
                         .HasForeignKey("LastModifierId");
+
+                    b.HasOne("Promact.CustomerSuccess.Platform.Entities.Project", null)
+                        .WithMany("VersionHistories")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Creator");
 
@@ -3255,9 +3271,21 @@ namespace Promact.CustomerSuccess.Platform.Migrations
 
                     b.Navigation("PhaseMilestones");
 
+                    b.Navigation("ProjectOverviews");
+
+                    b.Navigation("ProjectUpdates");
+
                     b.Navigation("Resources");
 
                     b.Navigation("RiskProfiles");
+
+                    b.Navigation("Sprints");
+
+                    b.Navigation("StakeAndScopes");
+
+                    b.Navigation("Stakeholders");
+
+                    b.Navigation("VersionHistories");
                 });
 
             modelBuilder.Entity("Promact.CustomerSuccess.Platform.Entities.RiskProfile", b =>

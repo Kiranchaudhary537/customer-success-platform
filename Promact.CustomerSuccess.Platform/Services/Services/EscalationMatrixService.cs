@@ -7,10 +7,14 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Promact.CustomerSuccess.Platform.Services.Services
 {
-    public class EscalationMatrixService : CrudAppService<EscalationMatrix,
-        EscalationMatrixDto, Guid, PagedAndSortedResultRequestDto,
-        CreateEscalationMatrixDto,
-        UpdateEscalationMatrixDto>, IService
+    public class EscalationMatrixService : 
+        CrudAppService<
+            EscalationMatrix,
+            EscalationMatrixDto, 
+            Guid, 
+            PagedAndSortedResultRequestDto,
+            CreateEscalationMatrixDto,
+            UpdateEscalationMatrixDto>, IService
     {
         private readonly IMapper _mapper;
         public EscalationMatrixService(IRepository<EscalationMatrix, Guid> repository, IMapper mapper) : base(repository)

@@ -17,7 +17,7 @@ namespace Promact.CustomerSuccess.Platform.Services.Services
         IService
     {
         private readonly IMapper _mapper;
-        public ClientFeedbackService(IRepository<ClientFeedback, Guid> repository, Mapper mapper) :
+        public ClientFeedbackService(IRepository<ClientFeedback, Guid> repository, IMapper mapper) :
             base(repository)
         {
             _mapper = mapper;

@@ -9,7 +9,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Promact.CustomerSuccess.Platform.Services.Services
 {
-  public class ApprovedTeamService : CrudAppService<ApprovedTeam,
+  public class ApprovedTeamService : 
+        CrudAppService<
+            ApprovedTeam,
             ApprovedTeamDto,
             Guid,
             PagedAndSortedResultRequestDto,
@@ -17,21 +19,21 @@ namespace Promact.CustomerSuccess.Platform.Services.Services
             UpdateApprovedTeamDto>,
         IService
   {
-    private readonly IMapper _mapper;
-    public ApprovedTeamService(IRepository<ApprovedTeam, Guid> repository,Mapper mapper) :
+        private readonly IMapper _mapper;
+        public ApprovedTeamService(IRepository<ApprovedTeam, Guid> repository,IMapper mapper) :
         base(repository)
     {
       _mapper = mapper;
     }
 
     // get all by project id
-    public async Task<List<ApprovedTeamDto>> GetByProjectIdAsync(Guid projectId)
+    public async Task<List<ApprovedTeamDto>> GetAllByProjectIdAsync(Guid projectId)
     {
       var result = await Repository.GetListAsync(x => x.ProjectId == projectId);
       return _mapper.Map<List<ApprovedTeam>, List<ApprovedTeamDto>>(result);
     }
-        // get by phase milestone id
-    public async Task<ApprovedTeamDto> GetByPhaseMilestoneIdAsync(Guid phaseMilestoneId)
+     // get by phase milestone id
+    public async Task<ApprovedTeamDto> GetAllByPhaseMilestoneIdAsync(Guid phaseMilestoneId)
     {
             var sprint = await Repository.FirstOrDefaultAsync(x => x.PhaseMilestoneId == phaseMilestoneId);
             return _mapper.Map<ApprovedTeamDto>(sprint);

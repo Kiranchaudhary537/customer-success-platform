@@ -20,7 +20,7 @@ namespace Promact.CustomerSuccess.Platform.Services.Services
   {
     private readonly IMapper _mapper;
         private readonly EmailService _emailService;
-        public AuditHistoryService(IRepository<AuditHistory, Guid> repository, EmailService emailService, Mapper mapper) :
+        public AuditHistoryService(IRepository<AuditHistory, Guid> repository, EmailService emailService,IMapper mapper) :
         base(repository)
         {
           _mapper = mapper;

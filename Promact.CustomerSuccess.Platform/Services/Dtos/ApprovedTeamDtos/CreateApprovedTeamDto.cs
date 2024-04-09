@@ -6,7 +6,7 @@ namespace Promact.CustomerSuccess.Platform.Services.Dtos.ApprovedTeamDtos
     public string Role { get; set; }
     public int Availablity { get; set; }
     public int Duration { get; set; }
-    public Guid PhaseId { get; set; }
+    public Guid PhaseMilestoneId { get; set; }
     public Guid ProjectId { get; set; }
   }
 }

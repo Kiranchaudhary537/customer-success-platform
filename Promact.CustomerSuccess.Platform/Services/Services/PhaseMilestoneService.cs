@@ -7,8 +7,14 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Promact.CustomerSuccess.Platform.Services.Services
 {
-  public class PhaseMilestoneService : CrudAppService<PhaseMilestone,
-      PhaseMilestoneDto, Guid, PagedAndSortedResultRequestDto, CreatePhaseMilestoneDto, UpdatePhaseMilestoneDto>,
+  public class PhaseMilestoneService : 
+        CrudAppService<
+            PhaseMilestone,
+            PhaseMilestoneDto, 
+            Guid, 
+            PagedAndSortedResultRequestDto,
+            CreatePhaseMilestoneDto, 
+            UpdatePhaseMilestoneDto>,
         IService
     {
         private readonly IMapper _mapper;
@@ -22,8 +28,8 @@ namespace Promact.CustomerSuccess.Platform.Services.Services
             DeletePolicyName = "delete:phase";
         }
 
-        // get all phase milestones by project id
-        public async Task<List<PhaseMilestoneDto>> GetByProjectIdAsync(Guid projectId)
+        // get all by project id
+        public async Task<List<PhaseMilestoneDto>> GetAllByProjectIdAsync(Guid projectId)
         {
             var phaseMilestones = await Repository.GetListAsync(x => x.ProjectId == projectId);
             return _mapper.Map<List<PhaseMilestone>, List<PhaseMilestoneDto>>(phaseMilestones);

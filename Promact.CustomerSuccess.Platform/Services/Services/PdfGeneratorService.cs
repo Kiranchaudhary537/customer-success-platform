@@ -59,9 +59,9 @@ namespace Promact.CustomerSuccess.Platform.Services.Services
             var project = await _project.GetAsync(id);
 
 
-            var projectApprovedTeams = await _approvedTeam.GetByProjectIdAsync(id);
+            var projectApprovedTeams = await _approvedTeam.GetAllByProjectIdAsync(id);
    
-            var phase = await _phase.GetByProjectIdAsync(id);
+            var phase = await _phase.GetAllByProjectIdAsync(id);
           
             var projectclientfeedback = await _clientFeedback.GetAllByProjectIdAsync(id);
 
